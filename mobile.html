@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mobile Admin - Album Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      margin: 0;
+      padding: 2rem 1rem;
+      background: #f5f7fa;
+      color: #111827;
+      max-width: 900px;
+      margin-inline: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 0.25rem;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: #6b7280;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="file"],
+    input[type="text"] {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 0.8rem;
+      font-size: 0.95rem;
+      color: #374151;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="file"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    li {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    li:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    li img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 0.6rem;
+      transition: transform 0.3s ease;
+    }
+
+    li:hover img {
+      transform: scale(1.03);
+    }
+
+    .title-caption {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 0.25rem;
+      text-align: center;
+    }
+
+    .desc-caption {
+      font-size: 0.85rem;
+      color: #4b5563;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    li button {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    li button:hover {
+      background: #dc2626;
+      transform: scale(1.05);
+    }
+
+    #albumList p {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #6b7280;
+      padding: 1rem 0;
+      font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1.2rem;
+      }
+
+      header h1 {
+        font-size: 1.3rem;
+      }
+
+      .card {
+        padding: 1rem;
+      }
+
+      button {
+        font-size: 0.9rem;
+      }
+
+      li img {
+        height: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Album Manager</h1>
+    <p>Manage uploaded carousel images, titles, and descriptions</p>
+  </header>
+
+  <div class="card">
+    <div class="form">
+      <input type="file" id="albumFile" accept="image/*" />
+      <input type="text" id="albumTitle" placeholder="Enter title..." />
+      <input type="text" id="albumDesc" placeholder="Enter description..." />
+      <button onclick="uploadAlbumImage()">Upload Image + Text</button>
+    </div>
+    <ul id="albumList"></ul>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    let supabase;
+
+    // Fetch config from Vercel API route
+    async function initSupabase() {
+      const res = await fetch("/api/config");
+      const config = await res.json();
+      supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+
+      loadMessages();
+      loadAlbum();
+      loadBarbers();
+    }
+
+    const ALBUM_MOBILE = "album_mobile";
+
+    async function loadAlbum() {
+      const { data, error } = await supabase.from("album_mobile").select("*").order("created_at", { ascending: false });
+      if (error) return alert("❌ Failed to load album: " + error.message);
+
+      const list = document.getElementById("albumList");
+      list.innerHTML = "";
+      if (!data.length) {
+        list.innerHTML = "<p>No images yet.</p>";
+        return;
+      }
+
+      data.forEach((img) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <img src="${img.image_url}" alt="Album Image"/>
+          ${img.title_caption ? `<div class="title-caption">${img.title_caption}</div>` : ""}
+          ${img.desc_caption ? `<div class="desc-caption">${img.desc_caption}</div>` : ""}
+        `;
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.onclick = async () => {
+          const filePath = img.image_url.split("/").pop();
+          let { error: fileError } = await supabase.storage.from(ALBUM_MOBILE).remove([filePath]);
+          if (fileError) alert("❌ Failed to delete file: " + fileError.message);
+          let { error: dbError } = await supabase.from("album_mobile").delete().eq("id", img.id);
+          if (dbError) alert("❌ Failed to delete record: " + dbError.message);
+          else alert("✅ Image deleted!");
+          loadAlbum();
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+
+    window.uploadAlbumImage = async function () {
+      const fileInput = document.getElementById("albumFile");
+      const titleInput = document.getElementById("albumTitle");
+      const descInput = document.getElementById("albumDesc");
+
+      if (!fileInput.files.length) return alert("⚠️ Please select an image!");
+
+      const file = fileInput.files[0];
+      const title_caption = titleInput.value.trim();
+      const desc_caption = descInput.value.trim();
+
+      const filePath = `${Date.now()}-${file.name}`;
+      let { error: uploadError } = await supabase.storage.from(ALBUM_MOBILE).upload(filePath, file);
+      if (uploadError) return alert("❌ Upload failed: " + uploadError.message);
+
+      const { data: { publicUrl } } = supabase.storage.from(ALBUM_MOBILE).getPublicUrl(filePath);
+
+      let { error: insertError } = await supabase.from("album_mobile").insert({
+        image_url: publicUrl,
+        title_caption: title_caption || null,
+        desc_caption: desc_caption || null
+      });
+
+      if (insertError) return alert("❌ Failed to save in DB: " + insertError.message);
+
+      alert("✅ Image, title & description uploaded!");
+      fileInput.value = "";
+      titleInput.value = "";
+      descInput.value = "";
+      loadAlbum();
+    };
+
+    loadAlbum();
+  </script>
+</body>
+</html>

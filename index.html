@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Website Panel</title>
+  <style>
+      * {
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Poppins', Arial, sans-serif;
+          background: #f5f7fa;
+          color: #111827;
+          margin: 0;
+          padding: 2rem 1rem;
+          max-width: 900px;
+          margin-inline: auto;
+        }
+
+        /* ✅ Navigation */
+        nav {
+          display: flex;
+          justify-content: center;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          margin-bottom: 1.5rem;
+        }
+
+        nav a {
+          color: #2563eb;
+          font-weight: 600;
+          text-decoration: none;
+          position: relative;
+          cursor: pointer;
+          transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+          color: #1d4ed8;
+        }
+
+        nav a::after {
+          content: "";
+          position: absolute;
+          width: 0%;
+          height: 2px;
+          bottom: -4px;
+          left: 0;
+          background-color: #2563eb;
+          transition: width 0.3s;
+          border-radius: 2px;
+        }
+
+        nav a:hover::after {
+          width: 100%;
+        }
+
+        hr {
+          border: none;
+          height: 1px;
+          background: #e5e7eb;
+          margin-bottom: 1.5rem;
+        }
+
+        /* ✅ Sections */
+        section {
+          display: none;
+          background: #ffffff;
+          padding: 1.5rem;
+          border-radius: 16px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+          animation: fadeIn 0.3s ease-in-out;
+        }
+
+        section.active {
+          display: block;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        section h2 {
+          margin-bottom: 1rem;
+          font-size: 1.3rem;
+          color: #1f2937;
+        }
+
+        /* ✅ Forms */
+        .form {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          margin-bottom: 1.2rem;
+        }
+
+        .form input {
+          padding: 10px 14px;
+          border: 1px solid #d1d5db;
+          border-radius: 10px;
+          outline: none;
+          font-size: 0.95rem;
+          transition: all 0.2s ease;
+        }
+
+        .form input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .form button {
+          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          color: white;
+          border: none;
+          border-radius: 25px;
+          padding: 10px 20px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .form button:hover {
+          background: linear-gradient(135deg, #1e40af, #2563eb);
+          transform: scale(1.03);
+        }
+
+        /* ✅ Lists */
+        ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: grid;
+          gap: 10px;
+        }
+
+        li {
+          background: #f9fafb;
+          padding: 12px 16px;
+          border-radius: 12px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        li:hover {
+          background: #eef2ff;
+          transform: translateY(-2px);
+        }
+
+        li img {
+          width: 70px;
+          height: 70px;
+          border-radius: 10px;
+          object-fit: cover;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        li span {
+          flex: 1;
+          margin-left: 1rem;
+          color: #1f2937;
+          font-weight: 500;
+        }
+
+        li button {
+          background: #ef4444;
+          border: none;
+          padding: 8px 14px;
+          color: white;
+          border-radius: 10px;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        li button:hover {
+          background: #dc2626;
+          transform: scale(1.05);
+        }
+
+        /* ✅ Responsive */
+        @media (max-width: 640px) {
+          body {
+            padding: 1rem;
+          }
+
+          li {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+          }
+
+          li img {
+            width: 100%;
+            max-height: 180px;
+            border-radius: 12px;
+          }
+
+          li button {
+            align-self: flex-end;
+          }
+        }
+  </style>
+</head>
+<body>
+  <!-- ✅ Navbar -->
+  <nav>
+    <a onclick="showPanel('banner')">Banner Messages</a>
+    <a onclick="showPanel('album')">Album</a>
+    <a onclick="showPanel('barbers')">Barbers</a>
+  </nav>
+  <hr/>
+
+  <!-- Banner Section -->
+  <section id="banner" class="active">
+    <h2>Manage Banner Messages</h2>
+    <div class="form" style="flex-direction: row; gap: 0.5rem;">
+      <input id="newMessage" placeholder="Enter new banner message"/>
+      <input id="newLink" placeholder="Enter link (optional)" style="flex:1"/>
+      <button onclick="addMessage()" style="padding: 10px 20px; border-radius: 2px;">Add</button>
+    </div>
+    <ul id="messages"></ul>
+  </section>
+
+
+  <!-- Album Section -->
+  <section id="album">
+    <h2>Manage Album Carousel</h2>
+    <div class="form">
+      <input type="file" id="albumFile" accept="image/*" />
+      <button onclick="uploadAlbumImage()">Upload Image</button>
+    </div>
+    <ul id="albumList"></ul>
+  </section>
+
+  <!-- Barbers Section -->
+  <section id="barbers">
+    <h2>Manage Barbers</h2>
+    <div class="form">
+      <input type="text" id="barberName" placeholder="Enter barber name"/>
+      <input type="file" id="barberFile" accept="image/*" />
+      <button onclick="uploadBarber()">Add Barber</button>
+    </div>
+    <ul id="barberList"></ul>
+  </section>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    let supabase;
+
+    // Fetch config from Vercel API route
+    async function initSupabase() {
+      const res = await fetch("/api/config");
+      const config = await res.json();
+      supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+
+      loadMessages();
+      loadAlbum();
+      loadBarbers();
+    }
+
+
+    const ALBUM_BUCKET = "album_bucket";
+    const BARBERS_BUCKET = "barbers_bucket";
+
+    // ----------------- Banner -----------------
+    async function loadMessages() {
+    const { data, error } = await supabase.from("banner_messages").select("*").order("created_at");
+    if (error) return alert("❌ Failed to load messages: " + error.message);
+    const list = document.getElementById("messages");
+    list.innerHTML = "";
+    if (!data.length) alert("ℹ️ No banner messages found.");
+    data.forEach(msg => {
+      const li = document.createElement("li");
+
+      if (msg.link) {
+        // ✅ Kung may link, clickable yung message
+        li.innerHTML = `<span>${msg.text} - <a href="${msg.link}" target="_blank" style="color:blue; text-decoration:underline;">link</a></span>`;
+      } else {
+        li.textContent = msg.text;
+      }
+
+      const btn = document.createElement("button");
+      btn.textContent = "Delete";
+      btn.onclick = async () => { 
+        let { error: delError } = await supabase.from("banner_messages").delete().eq("id", msg.id); 
+        if (delError) alert("❌ Failed to delete message: " + delError.message);
+        else alert("✅ Banner message deleted!");
+        loadMessages(); 
+      };
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+  }
+
+window.addMessage = async function() {
+  const input = document.getElementById("newMessage");
+  const linkInput = document.getElementById("newLink");
+  if (!input.value) return alert("⚠️ Enter message first!");
+
+  let { error } = await supabase.from("banner_messages").insert({ 
+    text: input.value, 
+    link: linkInput.value || null 
+  });
+  if (error) return alert("❌ Failed to add message: " + error.message);
+  alert("✅ Banner message added!");
+  input.value = "";
+  linkInput.value = "";
+  loadMessages();
+};
+
+
+    // ----------------- Album -----------------
+    async function loadAlbum() {
+      const { data, error } = await supabase.from("album").select("*").order("created_at");
+      if (error) return alert("❌ Failed to load album: " + error.message);
+      const list = document.getElementById("albumList");
+      list.innerHTML = "";
+      if (!data.length) alert("ℹ️ No album images found.");
+      data.forEach((img) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<img src="${img.image_url}" alt="Album Image"/>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.onclick = async () => {
+          const filePath = img.image_url.split("/").pop();
+          let { error: fileError } = await supabase.storage.from(ALBUM_BUCKET).remove([filePath]);
+          if (fileError) alert("❌ Failed to delete file: " + fileError.message);
+          else alert("✅ File deleted from storage");
+          let { error: dbError } = await supabase.from("album").delete().eq("id", img.id);
+          if (dbError) alert("❌ Failed to delete DB row: " + dbError.message);
+          else alert("✅ Album record deleted");
+          loadAlbum();
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+    window.uploadAlbumImage = async function () {
+      const fileInput = document.getElementById("albumFile");
+      if (!fileInput.files.length) return alert("⚠️ Please select an image!");
+      const file = fileInput.files[0];
+      const filePath = `${Date.now()}-${file.name}`;
+      let { error: uploadError } = await supabase.storage.from(ALBUM_BUCKET).upload(filePath, file);
+      if (uploadError) return alert("❌ Upload failed: " + uploadError.message);
+      alert("✅ Image uploaded to storage");
+      const { data: { publicUrl } } = supabase.storage.from(ALBUM_BUCKET).getPublicUrl(filePath);
+      let { error: insertError } = await supabase.from("album").insert({ image_url: publicUrl });
+      if (insertError) return alert("❌ Failed to save in DB: " + insertError.message);
+      alert("✅ Album image added!");
+      fileInput.value = "";
+      loadAlbum();
+    };
+
+    // ----------------- Barbers -----------------
+    async function loadBarbers() {
+      const { data, error } = await supabase.from("barbers").select("*").order("created_at");
+      if (error) return alert("❌ Failed to load barbers: " + error.message);
+      const list = document.getElementById("barberList");
+      list.innerHTML = "";
+      if (!data.length) alert("ℹ️ No barbers found.");
+      data.forEach(barber => {
+        const li = document.createElement("li");
+        li.innerHTML = `<img src="${barber.image_url}" alt="${barber.name}"/> <span>${barber.name}</span>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.onclick = async () => {
+          const filePath = barber.image_url.split("/").pop();
+          let { error: fileError } = await supabase.storage.from(BARBERS_BUCKET).remove([filePath]);
+          if (fileError) alert("❌ Failed to delete file: " + fileError.message);
+          else alert("✅ File deleted from storage");
+          let { error: dbError } = await supabase.from("barbers").delete().eq("id", barber.id);
+          if (dbError) alert("❌ Failed to delete DB row: " + dbError.message);
+          else alert("✅ Barber deleted");
+          loadBarbers();
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+    window.uploadBarber = async function () {
+      const name = document.getElementById("barberName").value;
+      const file = document.getElementById("barberFile").files[0];
+      if (!name || !file) return alert("⚠️ Name and image required!");
+      const filePath = `${Date.now()}-${file.name}`;
+      let { error: uploadError } = await supabase.storage.from(BARBERS_BUCKET).upload(filePath, file);
+      if (uploadError) return alert("❌ Upload failed: " + uploadError.message);
+      alert("✅ Image uploaded to storage");
+      const { data: { publicUrl } } = supabase.storage.from(BARBERS_BUCKET).getPublicUrl(filePath);
+      let { error: insertError } = await supabase.from("barbers").insert({ name, image_url: publicUrl });
+      if (insertError) return alert("❌ Failed to save barber: " + insertError.message);
+      alert("✅ Barber added!");
+      document.getElementById("barberName").value = "";
+      document.getElementById("barberFile").value = "";
+      loadBarbers();
+    };
+
+    // ----------------- Init -----------------
+    loadMessages();
+    loadAlbum();
+    loadBarbers();
+
+    // Panel switcher
+    window.showPanel = function(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+  </script>
+</body>
+</html>
