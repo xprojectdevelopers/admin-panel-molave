@@ -258,7 +258,9 @@
       const config = await res.json();
       supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
 
-      initSupabase();
+      loadMessages();
+      loadAlbum();
+      loadBarbers();
     }
 
 
@@ -398,9 +400,7 @@ window.addMessage = async function() {
     };
 
     // ----------------- Init -----------------
-    loadMessages();
-    loadAlbum();
-    loadBarbers();
+    initSupabase();
 
     // Panel switcher
     window.showPanel = function(id) {
