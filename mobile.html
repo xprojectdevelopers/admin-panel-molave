@@ -216,25 +216,39 @@
     import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
     let supabase;
-
-    // Fetch config from Vercel API route
-    async function initSupabase() {
-      const res = await fetch("/api/config");
-      const config = await res.json();
-      supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
-
-      loadMessages();
-      loadAlbum();
-      loadBarbers();
-    }
-
     const ALBUM_MOBILE = "album_mobile";
 
-    async function loadAlbum() {
-      const { data, error } = await supabase.from("album_mobile").select("*").order("created_at", { ascending: false });
-      if (error) return alert("❌ Failed to load album: " + error.message);
+    // ✅ Fetch Supabase config from /api/config
+    async function initSupabase() {
+      try {
+        const res = await fetch("/api/config");
+        if (!res.ok) throw new Error("Config fetch failed");
+        const config = await res.json();
 
+        supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+
+        // ✅ Once initialized, load data
+        loadAlbum();
+      } catch (err) {
+        alert("❌ Failed to initialize Supabase: " + err.message);
+        console.error(err);
+      }
+    }
+
+    async function loadAlbum() {
       const list = document.getElementById("albumList");
+      list.innerHTML = "<p>Loading...</p>";
+
+      const { data, error } = await supabase
+        .from(ALBUM_MOBILE)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        list.innerHTML = `<p>❌ Failed to load: ${error.message}</p>`;
+        return;
+      }
+
       list.innerHTML = "";
       if (!data.length) {
         list.innerHTML = "<p>No images yet.</p>";
@@ -248,17 +262,21 @@
           ${img.title_caption ? `<div class="title-caption">${img.title_caption}</div>` : ""}
           ${img.desc_caption ? `<div class="desc-caption">${img.desc_caption}</div>` : ""}
         `;
+
         const btn = document.createElement("button");
         btn.textContent = "Delete";
         btn.onclick = async () => {
           const filePath = img.image_url.split("/").pop();
           let { error: fileError } = await supabase.storage.from(ALBUM_MOBILE).remove([filePath]);
-          if (fileError) alert("❌ Failed to delete file: " + fileError.message);
-          let { error: dbError } = await supabase.from("album_mobile").delete().eq("id", img.id);
-          if (dbError) alert("❌ Failed to delete record: " + dbError.message);
-          else alert("✅ Image deleted!");
+          if (fileError) return alert("❌ Failed to delete file: " + fileError.message);
+
+          let { error: dbError } = await supabase.from(ALBUM_MOBILE).delete().eq("id", img.id);
+          if (dbError) return alert("❌ Failed to delete record: " + dbError.message);
+
+          alert("✅ Image deleted!");
           loadAlbum();
         };
+
         li.appendChild(btn);
         list.appendChild(li);
       });
@@ -272,31 +290,30 @@
       if (!fileInput.files.length) return alert("⚠️ Please select an image!");
 
       const file = fileInput.files[0];
-      const title_caption = titleInput.value.trim();
-      const desc_caption = descInput.value.trim();
-
       const filePath = `${Date.now()}-${file.name}`;
-      let { error: uploadError } = await supabase.storage.from(ALBUM_MOBILE).upload(filePath, file);
+
+      const { error: uploadError } = await supabase.storage.from(ALBUM_MOBILE).upload(filePath, file);
       if (uploadError) return alert("❌ Upload failed: " + uploadError.message);
 
       const { data: { publicUrl } } = supabase.storage.from(ALBUM_MOBILE).getPublicUrl(filePath);
 
-      let { error: insertError } = await supabase.from("album_mobile").insert({
+      const { error: insertError } = await supabase.from(ALBUM_MOBILE).insert({
         image_url: publicUrl,
-        title_caption: title_caption || null,
-        desc_caption: desc_caption || null
+        title_caption: titleInput.value.trim() || null,
+        desc_caption: descInput.value.trim() || null,
       });
 
       if (insertError) return alert("❌ Failed to save in DB: " + insertError.message);
 
-      alert("✅ Image, title & description uploaded!");
+      alert("✅ Image uploaded successfully!");
       fileInput.value = "";
       titleInput.value = "";
       descInput.value = "";
       loadAlbum();
     };
 
-    loadAlbum();
+    // ✅ Initialize Supabase on load
+    initSupabase();
   </script>
 </body>
 </html>

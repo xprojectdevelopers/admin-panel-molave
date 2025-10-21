@@ -258,9 +258,7 @@
       const config = await res.json();
       supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
 
-      loadMessages();
-      loadAlbum();
-      loadBarbers();
+      initSupabase();
     }
 
 
