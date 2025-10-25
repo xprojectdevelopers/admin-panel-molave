@@ -211,6 +211,7 @@
     <a onclick="showPanel('banner')">Banner Messages</a>
     <a onclick="showPanel('album')">Album</a>
     <a onclick="showPanel('barbers')">Barbers</a>
+    <a onclick="showPanel('services')">Services</a>
   </nav>
   <hr/>
 
@@ -247,6 +248,18 @@
     <ul id="barberList"></ul>
   </section>
 
+  <!-- Services Section -->
+  <section id="services">
+    <h2>Manage Services & Prices</h2>
+    <div class="form">
+      <input type="text" id="serviceName" placeholder="Enter service name" />
+      <input type="text" id="servicePrice" placeholder="Enter price (e.g. ₱150)" />
+      <button onclick="addService()">Add Service</button>
+    </div>
+    <ul id="serviceList"></ul>
+  </section>
+
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
@@ -261,6 +274,7 @@
       loadMessages();
       loadAlbum();
       loadBarbers();
+      loadServices();
     }
 
 
@@ -297,21 +311,21 @@
     });
   }
 
-window.addMessage = async function() {
-  const input = document.getElementById("newMessage");
-  const linkInput = document.getElementById("newLink");
-  if (!input.value) return alert("⚠️ Enter message first!");
+  window.addMessage = async function() {
+    const input = document.getElementById("newMessage");
+    const linkInput = document.getElementById("newLink");
+    if (!input.value) return alert("⚠️ Enter message first!");
 
-  let { error } = await supabase.from("banner_messages").insert({ 
-    text: input.value, 
-    link: linkInput.value || null 
-  });
-  if (error) return alert("❌ Failed to add message: " + error.message);
-  alert("✅ Banner message added!");
-  input.value = "";
-  linkInput.value = "";
-  loadMessages();
-};
+    let { error } = await supabase.from("banner_messages").insert({ 
+      text: input.value, 
+      link: linkInput.value || null 
+    });
+    if (error) return alert("❌ Failed to add message: " + error.message);
+    alert("✅ Banner message added!");
+    input.value = "";
+    linkInput.value = "";
+    loadMessages();
+  };
 
 
     // ----------------- Album -----------------
@@ -398,6 +412,46 @@ window.addMessage = async function() {
       document.getElementById("barberFile").value = "";
       loadBarbers();
     };
+
+    // ----------------- Services -----------------
+    async function loadServices() {
+      const { data, error } = await supabase.from("services").select("*").order("created_at");
+      if (error) return alert("❌ Failed to load services: " + error.message);
+      const list = document.getElementById("serviceList");
+      list.innerHTML = "";
+      if (!data.length) alert("ℹ️ No services found.");
+
+      data.forEach(service => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${service.name} — <strong>${service.price}</strong></span>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.onclick = async () => {
+          const { error: delError } = await supabase.from("services").delete().eq("id", service.id);
+          if (delError) alert("❌ Failed to delete: " + delError.message);
+          else alert("✅ Service deleted!");
+          loadServices();
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+
+    window.addService = async function () {
+      const name = document.getElementById("serviceName").value.trim();
+      const price = document.getElementById("servicePrice").value.trim();
+
+      if (!name || !price) return alert("⚠️ Both name and price are required!");
+
+      const { error } = await supabase.from("services").insert({ name, price });
+      if (error) return alert("❌ Failed to add service: " + error.message);
+      alert("✅ Service added successfully!");
+
+      document.getElementById("serviceName").value = "";
+      document.getElementById("servicePrice").value = "";
+      loadServices();
+    };
+
 
     // ----------------- Init -----------------
     initSupabase();
