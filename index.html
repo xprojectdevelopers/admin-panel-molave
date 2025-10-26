@@ -212,6 +212,7 @@
     <a onclick="showPanel('album')">Album</a>
     <a onclick="showPanel('barbers')">Barbers</a>
     <a onclick="showPanel('services')">Services</a>
+    <a onclick="showPanel('testimonials')">Testimonials</a>
   </nav>
   <hr/>
 
@@ -259,6 +260,19 @@
     <ul id="serviceList"></ul>
   </section>
 
+  <!-- Testimonials Section -->
+  <section id="testimonials">
+    <h2>Manage Testimonials</h2>
+    <div class="form">
+      <input type="text" id="testimonialName" placeholder="Enter client name" />
+      <input type="text" id="testimonialPosition" placeholder="Enter position (e.g. Regular Customer)" />
+      <input type="text" id="testimonialContent" placeholder="Enter testimonial message" />
+      <button onclick="addTestimonial()">Add Testimonial</button>
+    </div>
+    <ul id="testimonialList"></ul>
+  </section>
+
+
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js";
@@ -275,6 +289,7 @@
       loadAlbum();
       loadBarbers();
       loadServices();
+      loadTestimonials();
     }
 
 
@@ -451,6 +466,64 @@
       document.getElementById("servicePrice").value = "";
       loadServices();
     };
+
+
+    // ----------------- Testimonials -----------------
+    async function loadTestimonials() {
+      const { data, error } = await supabase.from("testimonials").select("*").order("created_at", { ascending: false });
+      if (error) return alert("❌ Failed to load testimonials: " + error.message);
+
+      const list = document.getElementById("testimonialList");
+      list.innerHTML = "";
+      if (!data.length) {
+        const empty = document.createElement("p");
+        empty.textContent = "ℹ️ No testimonials found.";
+        empty.style.textAlign = "center";
+        empty.style.color = "#6b7280";
+        list.appendChild(empty);
+        return;
+      }
+
+      data.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>
+            <strong>${item.name}</strong> 
+            ${item.position ? `— ${item.position}` : ""}
+            <br/>
+            <em>"${item.content}"</em>
+          </span>
+        `;
+        const btn = document.createElement("button");
+        btn.textContent = "Delete";
+        btn.onclick = async () => {
+          const { error: delError } = await supabase.from("testimonials").delete().eq("id", item.id);
+          if (delError) alert("❌ Failed to delete: " + delError.message);
+          else alert("✅ Testimonial deleted!");
+          loadTestimonials();
+        };
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+
+    window.addTestimonial = async function () {
+      const name = document.getElementById("testimonialName").value.trim();
+      const position = document.getElementById("testimonialPosition").value.trim();
+      const content = document.getElementById("testimonialContent").value.trim();
+
+      if (!name || !content) return alert("⚠️ Name and testimonial message are required!");
+
+      const { error } = await supabase.from("testimonials").insert({ name, position, content });
+      if (error) return alert("❌ Failed to add testimonial: " + error.message);
+      alert("✅ Testimonial added successfully!");
+
+      document.getElementById("testimonialName").value = "";
+      document.getElementById("testimonialPosition").value = "";
+      document.getElementById("testimonialContent").value = "";
+      loadTestimonials();
+    };
+
 
 
     // ----------------- Init -----------------
