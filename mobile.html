@@ -1,178 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mobile Admin - Album Management</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Mobile Admin Panel</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      margin: 0;
-      padding: 2rem 1rem;
+      font-family: 'Poppins', Arial, sans-serif;
       background: #f5f7fa;
       color: #111827;
+      margin: 0;
+      padding: 2rem 1rem;
       max-width: 900px;
       margin-inline: auto;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #1e3a8a;
-      margin-bottom: 0.25rem;
-    }
-
-    header p {
-      font-size: 0.95rem;
-      color: #6b7280;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-      transition: box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      margin-bottom: 1.5rem;
-    }
-
-    input[type="file"],
-    input[type="text"] {
-      background: #f9fafb;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      padding: 0.8rem;
-      font-size: 0.95rem;
-      color: #374151;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    input[type="file"]:focus,
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-
-    button {
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
-      color: white;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-
-    li {
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      padding: 0.75rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    li:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-    }
-
-    li img {
-      width: 100%;
-      height: 130px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 0.6rem;
-      transition: transform 0.3s ease;
-    }
-
-    li:hover img {
-      transform: scale(1.03);
-    }
-
-    .title-caption {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #1e3a8a;
-      margin-bottom: 0.25rem;
-      text-align: center;
-    }
-
-    .desc-caption {
-      font-size: 0.85rem;
-      color: #4b5563;
-      margin-bottom: 0.5rem;
-      text-align: center;
-      word-wrap: break-word;
-    }
-
-    li button {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 0.45rem 0.9rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    li button:hover {
-      background: #dc2626;
-      transform: scale(1.05);
-    }
-
-    #albumList p {
-      grid-column: 1 / -1;
-      text-align: center;
-      color: #6b7280;
-      padding: 1rem 0;
-      font-weight: 500;
-    }
-
+    /* ✅ LOGIN OVERLAY */
     #loginOverlay {
       position: fixed;
       inset: 0;
@@ -208,9 +52,7 @@
       transition: border 0.2s;
     }
 
-    #loginBox input:focus {
-      border-color: #2563eb;
-    }
+    #loginBox input:focus { border-color: #2563eb; }
 
     #loginBox button {
       background: linear-gradient(135deg, #2563eb, #3b82f6);
@@ -236,27 +78,167 @@
       display: none;
     }
 
+    /* ✅ NAVIGATION */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 1.2rem;
-      }
+    nav a {
+      color: #2563eb;
+      font-weight: 600;
+      text-decoration: none;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
 
-      header h1 {
-        font-size: 1.3rem;
-      }
+    nav a:hover { color: #1d4ed8; }
 
-      .card {
-        padding: 1rem;
-      }
+    nav a::after {
+      content: "";
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #2563eb;
+      transition: width 0.3s;
+      border-radius: 2px;
+    }
 
-      button {
-        font-size: 0.9rem;
-      }
+    nav a:hover::after,
+    nav a.active::after { width: 100%; }
 
-      li img {
-        height: 110px;
-      }
+    hr {
+      border: none;
+      height: 1px;
+      background: #e5e7eb;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ✅ SECTIONS */
+    section {
+      display: none;
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    section.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    section h2 {
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      color: #1f2937;
+    }
+
+    /* ✅ FORM */
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .form input {
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      outline: none;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .form input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+    }
+
+    .form button {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .form button:hover {
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      transform: scale(1.03);
+    }
+
+    /* ✅ LIST */
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    li {
+      background: #f9fafb;
+      padding: 12px 16px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    li:hover { background: #eef2ff; transform: translateY(-2px); }
+
+    li img {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    li span {
+      flex: 1;
+      margin-left: 1rem;
+      color: #1f2937;
+      font-weight: 500;
+    }
+
+    li button {
+      background: #ef4444;
+      border: none;
+      padding: 8px 14px;
+      color: white;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    li button:hover {
+      background: #dc2626;
+      transform: scale(1.05);
+    }
+
+    /* ✅ RESPONSIVE */
+    @media (max-width: 640px) {
+      body { padding: 1rem; }
+      li { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      li img { width: 100%; max-height: 180px; border-radius: 12px; }
+      li button { align-self: flex-end; }
     }
   </style>
 </head>
@@ -272,125 +254,47 @@
     </div>
   </div>
 
-  <header>
-    <h1>Album Manager</h1>
-    <p>Manage uploaded carousel images, titles, and descriptions</p>
-  </header>
+  <!-- ✅ NAVBAR -->
+  <nav>
+    <a onclick="showPanel('albums')" class="active">Albums</a>
+    <a onclick="showPanel('announcements')">Announcements</a>
+  </nav>
+  <hr/>
 
-  <div class="card">
+  <!-- ✅ ALBUMS -->
+  <section id="albums" class="active">
+    <h2>Manage Face Shapes & Hairstyles</h2>
     <div class="form">
       <input type="file" id="albumFile" accept="image/*" />
-      <input type="text" id="albumTitle" placeholder="Enter face shape type (e.g. round)" />
-      <input type="text" id="albumDesc" placeholder="Enter hair style (e.g. mullet)" />
+      <input type="text" id="albumTitle" placeholder="Enter face shape (e.g. Round)" />
+      <input type="text" id="albumDesc" placeholder="Enter hairstyle (e.g. Mullet)" />
       <button onclick="uploadAlbumImage()">Upload Image + Text</button>
     </div>
     <ul id="albumList"></ul>
-  </div>
+  </section>
+
+  <!-- ✅ ANNOUNCEMENTS -->
+  <section id="announcements">
+    <h2>Manage Monthly Announcements</h2>
+    <div class="form">
+      <input type="file" id="announcementFile" accept="image/*" />
+      <button onclick="uploadAnnouncementImage()">Upload Announcement Image</button>
+    </div>
+    <ul id="announcementList"></ul>
+  </section>
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-    let supabase;
-    const ALBUM_MOBILE = "album_mobile";
-
-    // ✅ Fetch Supabase config from /api/config
-    async function initSupabase() {
-      try {
-        const res = await fetch("/api/config");
-        if (!res.ok) throw new Error("Config fetch failed");
-        const config = await res.json();
-
-        supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
-
-        // ✅ Once initialized, load data
-        loadAlbum();
-      } catch (err) {
-        alert("❌ Failed to initialize Supabase: " + err.message);
-        console.error(err);
-      }
-    }
-
-    async function loadAlbum() {
-      const list = document.getElementById("albumList");
-      list.innerHTML = "<p>Loading...</p>";
-
-      const { data, error } = await supabase
-        .from(ALBUM_MOBILE)
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        list.innerHTML = `<p>❌ Failed to load: ${error.message}</p>`;
-        return;
-      }
-
-      list.innerHTML = "";
-      if (!data.length) {
-        list.innerHTML = "<p>No images yet.</p>";
-        return;
-      }
-
-      data.forEach((img) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <img src="${img.image_url}" alt="Album Image"/>
-          ${img.title_caption ? `<div class="title-caption">${img.title_caption}</div>` : ""}
-          ${img.desc_caption ? `<div class="desc-caption">${img.desc_caption}</div>` : ""}
-        `;
-
-        const btn = document.createElement("button");
-        btn.textContent = "Delete";
-        btn.onclick = async () => {
-          const filePath = img.image_url.split("/").pop();
-          let { error: fileError } = await supabase.storage.from(ALBUM_MOBILE).remove([filePath]);
-          if (fileError) return alert("❌ Failed to delete file: " + fileError.message);
-
-          let { error: dbError } = await supabase.from(ALBUM_MOBILE).delete().eq("id", img.id);
-          if (dbError) return alert("❌ Failed to delete record: " + dbError.message);
-
-          alert("✅ Image deleted!");
-          loadAlbum();
-        };
-
-        li.appendChild(btn);
-        list.appendChild(li);
-      });
-    }
-
-    window.uploadAlbumImage = async function () {
-      const fileInput = document.getElementById("albumFile");
-      const titleInput = document.getElementById("albumTitle");
-      const descInput = document.getElementById("albumDesc");
-
-      if (!fileInput.files.length) return alert("⚠️ Please select an image!");
-
-      const file = fileInput.files[0];
-      const filePath = `${Date.now()}-${file.name}`;
-
-      const { error: uploadError } = await supabase.storage.from(ALBUM_MOBILE).upload(filePath, file);
-      if (uploadError) return alert("❌ Upload failed: " + uploadError.message);
-
-      const { data: { publicUrl } } = supabase.storage.from(ALBUM_MOBILE).getPublicUrl(filePath);
-
-      const { error: insertError } = await supabase.from(ALBUM_MOBILE).insert({
-        image_url: publicUrl,
-        title_caption: titleInput.value.trim() || null,
-        desc_caption: descInput.value.trim() || null,
-      });
-
-      if (insertError) return alert("❌ Failed to save in DB: " + insertError.message);
-
-      alert("✅ Image uploaded successfully!");
-      fileInput.value = "";
-      titleInput.value = "";
-      descInput.value = "";
-      loadAlbum();
-    };
-
-    // Simple Admin Login (local only)
     const ADMIN_USER = "molavestreetbarbers";
     const ADMIN_PASS = "molavestreetbarbers123";
 
+    let supabase;
+    const ALBUM_BUCKET = "album_mobile";
+    const ANNOUNCEMENT_BUCKET = "monthly_announcement";
+    const ANNOUNCEMENT_TABLE = "announcement";
+
+    // ✅ Login
     window.login = function () {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
@@ -399,13 +303,10 @@
       if (u === ADMIN_USER && p === ADMIN_PASS) {
         document.getElementById("loginOverlay").style.display = "none";
         sessionStorage.setItem("adminLoggedIn", "true");
-        initSupabase(); // proceed to Supabase only after login
-      } else {
-        err.style.display = "block";
-      }
+        initSupabase();
+      } else err.style.display = "block";
     };
 
-    // Auto-login check (stay logged in during session)
     window.addEventListener("load", () => {
       if (sessionStorage.getItem("adminLoggedIn") === "true") {
         document.getElementById("loginOverlay").style.display = "none";
@@ -413,8 +314,106 @@
       }
     });
 
-    // Initialize Supabase on load
-    initSupabase();
+    // ✅ Show Sections
+    window.showPanel = function(id) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+
+      document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+      event.target.classList.add("active");
+    };
+
+    // ✅ Supabase Init
+    async function initSupabase() {
+      const res = await fetch("/api/config");
+      const config = await res.json();
+      supabase = createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+      loadAlbum();
+      loadAnnouncement();
+    }
+
+    // ✅ Album Logic
+    async function loadAlbum() {
+      const list = document.getElementById("albumList");
+      const { data, error } = await supabase.from(ALBUM_BUCKET).select("*").order("created_at", { ascending: false });
+      if (error) return (list.innerHTML = `<p>❌ ${error.message}</p>`);
+      list.innerHTML = "";
+      data.forEach(img => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <img src="${img.image_url}" alt="Image">
+          <span>${img.title_caption || ""} ${img.desc_caption ? `- ${img.desc_caption}` : ""}</span>
+          <button onclick="deleteAlbum(${img.id}, '${img.image_url}')">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    window.uploadAlbumImage = async function() {
+      const file = document.getElementById("albumFile").files[0];
+      const title = document.getElementById("albumTitle").value.trim();
+      const desc = document.getElementById("albumDesc").value.trim();
+      if (!file) return alert("⚠️ Please select an image.");
+
+      const filePath = `${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage.from(ALBUM_BUCKET).upload(filePath, file);
+      if (uploadError) return alert(uploadError.message);
+
+      const { data: { publicUrl } } = supabase.storage.from(ALBUM_BUCKET).getPublicUrl(filePath);
+      const { error: dbError } = await supabase.from(ALBUM_BUCKET).insert({
+        image_url: publicUrl, title_caption: title, desc_caption: desc
+      });
+      if (dbError) return alert(dbError.message);
+
+      alert("✅ Image uploaded!");
+      document.getElementById("albumFile").value = "";
+      document.getElementById("albumTitle").value = "";
+      document.getElementById("albumDesc").value = "";
+      loadAlbum();
+    };
+
+    window.deleteAlbum = async function(id, url) {
+      const file = url.split("/").pop();
+      await supabase.storage.from(ALBUM_BUCKET).remove([file]);
+      await supabase.from(ALBUM_BUCKET).delete().eq("id", id);
+      alert("✅ Deleted!");
+      loadAlbum();
+    };
+
+    // ✅ Announcement Logic
+    async function loadAnnouncement() {
+      const list = document.getElementById("announcementList");
+      const { data, error } = await supabase.from(ANNOUNCEMENT_TABLE).select("*").order("created_at", { ascending: false });
+      if (error) return (list.innerHTML = `<p>❌ ${error.message}</p>`);
+      list.innerHTML = "";
+      data.forEach(img => {
+        const li = document.createElement("li");
+        li.innerHTML = `<img src="${img.image_url}"><button onclick="deleteAnnouncement(${img.id}, '${img.image_url}')">Delete</button>`;
+        list.appendChild(li);
+      });
+    }
+
+    window.uploadAnnouncementImage = async function() {
+      const file = document.getElementById("announcementFile").files[0];
+      if (!file) return alert("⚠️ Please select an image.");
+
+      const filePath = `${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage.from(ANNOUNCEMENT_BUCKET).upload(filePath, file);
+      if (uploadError) return alert(uploadError.message);
+
+      const { data: { publicUrl } } = supabase.storage.from(ANNOUNCEMENT_BUCKET).getPublicUrl(filePath);
+      await supabase.from(ANNOUNCEMENT_TABLE).insert({ image_url: publicUrl });
+      alert("✅ Announcement uploaded!");
+      loadAnnouncement();
+    };
+
+    window.deleteAnnouncement = async function(id, url) {
+      const file = url.split("/").pop();
+      await supabase.storage.from(ANNOUNCEMENT_BUCKET).remove([file]);
+      await supabase.from(ANNOUNCEMENT_TABLE).delete().eq("id", id);
+      alert("✅ Deleted!");
+      loadAnnouncement();
+    };
   </script>
 </body>
 </html>
