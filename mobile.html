@@ -173,6 +173,70 @@
       font-weight: 500;
     }
 
+    #loginOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    #loginBox {
+      background: #ffffff;
+      padding: 2rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 320px;
+    }
+
+    #loginBox h2 {
+      margin-bottom: 1.2rem;
+      color: #1f2937;
+    }
+
+    #loginBox input {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      outline: none;
+      font-size: 0.95rem;
+      transition: border 0.2s;
+    }
+
+    #loginBox input:focus {
+      border-color: #2563eb;
+    }
+
+    #loginBox button {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      width: 100%;
+    }
+
+    #loginBox button:hover {
+      transform: scale(1.03);
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+    }
+
+    #loginError {
+      color: #ef4444;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+
     @media (max-width: 600px) {
       body {
         padding: 1.2rem;
@@ -197,6 +261,17 @@
   </style>
 </head>
 <body>
+  <!-- ✅ LOGIN OVERLAY -->
+  <div id="loginOverlay">
+    <div id="loginBox">
+      <h2>Admin Login</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p id="loginError">Invalid credentials. Try again.</p>
+    </div>
+  </div>
+
   <header>
     <h1>Album Manager</h1>
     <p>Manage uploaded carousel images, titles, and descriptions</p>
@@ -312,7 +387,33 @@
       loadAlbum();
     };
 
-    // ✅ Initialize Supabase on load
+    // Simple Admin Login (local only)
+    const ADMIN_USER = "molavestreetbarbers";
+    const ADMIN_PASS = "molavestreetbarbers123";
+
+    window.login = function () {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value.trim();
+      const err = document.getElementById("loginError");
+
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
+        document.getElementById("loginOverlay").style.display = "none";
+        sessionStorage.setItem("adminLoggedIn", "true");
+        initSupabase(); // proceed to Supabase only after login
+      } else {
+        err.style.display = "block";
+      }
+    };
+
+    // Auto-login check (stay logged in during session)
+    window.addEventListener("load", () => {
+      if (sessionStorage.getItem("adminLoggedIn") === "true") {
+        document.getElementById("loginOverlay").style.display = "none";
+        initSupabase();
+      }
+    });
+
+    // Initialize Supabase on load
     initSupabase();
   </script>
 </body>
